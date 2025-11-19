@@ -1,16 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Digital Clock</title>
-    <link rel="stylesheet" href="index.css" />
-    <script src="main.js" defer></script>
-    <link rel="manifest" href="manifest.json" />
-    <link rel="shortcut icon" href="public/favicon.ico" type="image/x-icon" />
-  </head>
-  <body class="dark">
-    <div class="app-container">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Clock</title>
+  <link rel="stylesheet" href="index.css" />
+  <script src="main.js" defer></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="shortcut icon" href="public/favicon.ico" type="image/x-icon" />
+</head>
+
+<body class="dark">
+  <div class="app-container">
+    <nav class="mode-switcher">
+      <button class="mode-btn active" data-mode="clock">Clock</button>
+      <button class="mode-btn" data-mode="timer">Timer</button>
+      <button class="mode-btn" data-mode="stopwatch">Stopwatch</button>
+    </nav>
+
+    <!-- Clock View -->
+    <div id="clock-view" class="view active">
       <div class="clock-wrapper">
         <div class="digit-group" id="hours">
           <div class="digit-container"></div>
@@ -33,53 +43,122 @@
       <div class="date-display" id="date-display"></div>
     </div>
 
-    <div class="controls">
-      <div class="settings-panel" id="settings-panel">
-        <div class="setting">
-          <span>Dark Mode</span>
-          <label class="switch">
-            <input type="checkbox" id="theme-toggle" />
-            <span class="slider"></span>
-          </label>
+    <!-- Timer View -->
+    <div id="timer-view" class="view">
+      <div class="clock-wrapper">
+        <div class="digit-group" id="timer-hours">
+          <div class="digit-container"></div>
+          <div class="digit-container"></div>
         </div>
-        <div class="setting">
-          <span>24-Hour Format</span>
-          <label class="switch">
-            <input type="checkbox" id="format-toggle" />
-            <span class="slider"></span>
-          </label>
+        <div class="separator">:</div>
+        <div class="digit-group" id="timer-minutes">
+          <div class="digit-container"></div>
+          <div class="digit-container"></div>
         </div>
-        <div class="setting">
-          <span>Show Seconds</span>
-          <label class="switch">
-            <input type="checkbox" id="seconds-toggle" checked />
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="setting">
-          <span>Fullscreen</span>
-          <label class="switch">
-            <input type="checkbox" id="fullscreen-toggle" />
-            <span class="slider"></span>
-          </label>
+        <div class="separator">:</div>
+        <div class="digit-group" id="timer-seconds">
+          <div class="digit-container"></div>
+          <div class="digit-container"></div>
         </div>
       </div>
-      <button class="settings-btn" id="settings-btn">⚙️</button>
+
+      <div class="timer-controls">
+        <div class="timer-inputs">
+          <input type="number" id="input-h" min="0" max="99" placeholder="00">
+          <span class="input-sep">:</span>
+          <input type="number" id="input-m" min="0" max="59" placeholder="00">
+          <span class="input-sep">:</span>
+          <input type="number" id="input-s" min="0" max="59" placeholder="00">
+        </div>
+        <div class="action-buttons">
+          <button id="timer-start-btn" class="action-btn start">Start</button>
+          <button id="timer-reset-btn" class="action-btn reset">Reset</button>
+        </div>
+      </div>
     </div>
 
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/worker.js")
-            .then((registration) =>
-              console.log("ServiceWorker registration successful")
-            )
-            .catch((err) =>
-              console.log("ServiceWorker registration failed:", err)
-            );
-        });
-      }
-    </script>
-  </body>
+    <!-- Stopwatch View -->
+    <div id="stopwatch-view" class="view">
+      <div class="clock-wrapper">
+        <div class="digit-group" id="sw-minutes">
+          <div class="digit-container"></div>
+          <div class="digit-container"></div>
+        </div>
+        <div class="separator">:</div>
+        <div class="digit-group" id="sw-seconds">
+          <div class="digit-container"></div>
+          <div class="digit-container"></div>
+        </div>
+        <div class="separator">.</div>
+        <div class="digit-group" id="sw-ms">
+          <div class="digit-container"></div>
+          <div class="digit-container"></div>
+        </div>
+      </div>
+
+      <div class="stopwatch-controls">
+        <div class="action-buttons">
+          <button id="sw-start-btn" class="action-btn start">Start</button>
+          <button id="sw-lap-btn" class="action-btn lap">Lap</button>
+          <button id="sw-reset-btn" class="action-btn reset">Reset</button>
+        </div>
+      </div>
+
+      <div class="laps-container">
+        <ul id="laps-list"></ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <div class="settings-panel" id="settings-panel">
+      <div class="setting">
+        <span>Dark Mode</span>
+        <label class="switch">
+          <input type="checkbox" id="theme-toggle" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="setting">
+        <span>24-Hour Format</span>
+        <label class="switch">
+          <input type="checkbox" id="format-toggle" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="setting">
+        <span>Show Seconds</span>
+        <label class="switch">
+          <input type="checkbox" id="seconds-toggle" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="setting">
+        <span>Fullscreen</span>
+        <label class="switch">
+          <input type="checkbox" id="fullscreen-toggle" />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+    <button class="settings-btn" id="settings-btn">⚙️</button>
+  </div>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/worker.js")
+          .then((registration) =>
+            console.log("ServiceWorker registration successful")
+          )
+          .catch((err) =>
+            console.log("ServiceWorker registration failed:", err)
+          );
+      });
+    }
+  </script>
+</body>
+
 </html>
