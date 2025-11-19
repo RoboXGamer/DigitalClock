@@ -68,9 +68,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Stopwatch
     stopwatch: {
+      h: D.querySelectorAll("#sw-hours .digit-container"),
       m: D.querySelectorAll("#sw-minutes .digit-container"),
       s: D.querySelectorAll("#sw-seconds .digit-container"),
       ms: D.querySelectorAll("#sw-ms .digit-container"),
+      hoursGroup: D.querySelector(".sw-hours-group"),
+      hoursSep: D.querySelector(".sw-hours-sep"),
+      msGroup: D.querySelector(".sw-ms-group"),
+      msSep: D.querySelector(".sw-ms-sep"),
       startBtn: D.getElementById("sw-start-btn"),
       lapBtn: D.getElementById("sw-lap-btn"),
       resetBtn: D.getElementById("sw-reset-btn"),
@@ -261,13 +266,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateStopwatchDisplay(elapsed) {
     const totalSeconds = Math.floor(elapsed / 1000);
-    const m = Math.floor(totalSeconds / 60);
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
     const s = totalSeconds % 60;
     const ms = Math.floor((elapsed % 1000) / 10);
 
+    // Show hours section when >= 60 minutes (3600 seconds)
+    const showHours = totalSeconds >= 3600;
+    if (showHours) {
+      ELS.stopwatch.hoursGroup.classList.add("show");
+      ELS.stopwatch.hoursSep.classList.add("show");
+      ELS.stopwatch.msGroup.classList.add("hide");
+      ELS.stopwatch.msSep.classList.add("hide");
+      setDigit(ELS.stopwatch.h, h);
+    } else {
+      ELS.stopwatch.hoursGroup.classList.remove("show");
+      ELS.stopwatch.hoursSep.classList.remove("show");
+      ELS.stopwatch.msGroup.classList.remove("hide");
+      ELS.stopwatch.msSep.classList.remove("hide");
+      setDigit(ELS.stopwatch.ms, ms);
+    }
+
     setDigit(ELS.stopwatch.m, m);
     setDigit(ELS.stopwatch.s, s);
-    setDigit(ELS.stopwatch.ms, ms);
   }
 
   function startStopwatch() {
@@ -317,12 +338,19 @@ document.addEventListener("DOMContentLoaded", () => {
     ELS.stopwatch.lapsList.innerHTML = state.stopwatch.laps
       .map((lap, index) => {
         const totalSeconds = Math.floor(lap / 1000);
-        const m = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+        const h = Math.floor(totalSeconds / 3600);
+        const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
         const s = String(totalSeconds % 60).padStart(2, "0");
         const ms = String(Math.floor((lap % 1000) / 10)).padStart(2, "0");
+
+        // Show hours in lap time if >= 1 hour
+        const timeStr = h > 0
+          ? `${String(h).padStart(2, "0")}:${m}:${s}.${ms}`
+          : `${m}:${s}.${ms}`;
+
         return `<li class="lap-item">
             <span class="lap-number">#${state.stopwatch.laps.length - index}</span>
-            <span>${m}:${s}.${ms}</span>
+            <span>${timeStr}</span>
         </li>`;
       })
       .join("");
