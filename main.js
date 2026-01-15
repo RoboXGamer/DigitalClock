@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Apply fast transition to milliseconds
-  ELS.stopwatch.ms.forEach(el => el.classList.add("fast-ms"));
+  ELS.stopwatch.ms.forEach((el) => el.classList.add("fast-ms"));
 
   // --- Helpers ---
   function saveState() {
@@ -115,10 +115,14 @@ document.addEventListener("DOMContentLoaded", () => {
   function setDigit(elements, value) {
     const s = String(value).padStart(2, "0");
     if (elements[0] && elements[0].firstElementChild) {
-      elements[0].firstElementChild.style.transform = `translateY(-${s[0] * 1.1}em)`;
+      elements[0].firstElementChild.style.transform = `translateY(-${
+        s[0] * 1.1
+      }em)`;
     }
     if (elements[1] && elements[1].firstElementChild) {
-      elements[1].firstElementChild.style.transform = `translateY(-${s[1] * 1.1}em)`;
+      elements[1].firstElementChild.style.transform = `translateY(-${
+        s[1] * 1.1
+      }em)`;
     }
   }
 
@@ -127,12 +131,12 @@ document.addEventListener("DOMContentLoaded", () => {
     state.currentMode = mode;
 
     // Update Buttons
-    ELS.modeBtns.forEach(btn => {
+    ELS.modeBtns.forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.mode === mode);
     });
 
     // Update Views
-    ELS.views.forEach(view => {
+    ELS.views.forEach((view) => {
       view.classList.remove("active");
       if (view.id === `${mode}-view`) {
         view.classList.add("active");
@@ -339,17 +343,23 @@ document.addEventListener("DOMContentLoaded", () => {
       .map((lap, index) => {
         const totalSeconds = Math.floor(lap / 1000);
         const h = Math.floor(totalSeconds / 3600);
-        const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+        const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(
+          2,
+          "0"
+        );
         const s = String(totalSeconds % 60).padStart(2, "0");
         const ms = String(Math.floor((lap % 1000) / 10)).padStart(2, "0");
 
         // Show hours in lap time if >= 1 hour
-        const timeStr = h > 0
-          ? `${String(h).padStart(2, "0")}:${m}:${s}.${ms}`
-          : `${m}:${s}.${ms}`;
+        const timeStr =
+          h > 0
+            ? `${String(h).padStart(2, "0")}:${m}:${s}.${ms}`
+            : `${m}:${s}.${ms}`;
 
         return `<li class="lap-item">
-            <span class="lap-number">#${state.stopwatch.laps.length - index}</span>
+            <span class="lap-number">#${
+              state.stopwatch.laps.length - index
+            }</span>
             <span>${timeStr}</span>
         </li>`;
       })
@@ -359,7 +369,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- UI State ---
   function applyUIState() {
     ELS.clock.seconds.style.display = state.showSeconds ? "contents" : "none";
-    ELS.clock.secondsSeparator.style.display = state.showSeconds ? "block" : "none";
+    ELS.clock.secondsSeparator.style.display = state.showSeconds
+      ? "block"
+      : "none";
     ELS.clock.ampmContainer.style.display = state.is24Hour ? "none" : "flex";
     docEl.classList.toggle("dark", state.isDark);
   }
@@ -367,23 +379,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Event Listeners ---
 
   // Mode Switching
-  ELS.modeBtns.forEach(btn => {
+  ELS.modeBtns.forEach((btn) => {
     btn.addEventListener("click", () => switchMode(btn.dataset.mode));
   });
 
   // Settings
-  ELS.settingsBtn.addEventListener("click", () =>
-    ELS.settingsPanel.classList.toggle("active")
-  );
-
-  D.addEventListener("click", (e) => {
-    if (
-      !ELS.settingsPanel.contains(e.target) &&
-      !ELS.settingsBtn.contains(e.target)
-    ) {
-      ELS.settingsPanel.classList.remove("active");
-    }
-  });
+  // No manual click listener needed for popover opening/closing due to Popover API
 
   ELS.settingsPanel.addEventListener("change", (e) => {
     if (e.target.type !== "checkbox") return;
